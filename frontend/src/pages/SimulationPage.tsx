@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Lightbulb,
+  Users, // ✨ 통계용 아이콘만 유지
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -25,6 +26,7 @@ type SimulationResult = {
     cons: string[]
     preparation: string[]
     recommendation: string
+    ratio?: number // ✨ 통계 비율 슬롯
   }
 
   optionB: {
@@ -34,6 +36,7 @@ type SimulationResult = {
     cons: string[]
     preparation: string[]
     recommendation: string
+    ratio?: number // ✨ 통계 비율 슬롯
   }
 
   summary: string
@@ -42,7 +45,6 @@ type SimulationResult = {
 export function SimulationPage() {
   const [state, setState] = useState<SimulationState>('input')
   const [input, setInput] = useState('')
-
   const [result, setResult] = useState<SimulationResult | null>(null)
 
   const handleSimulate = async () => {
@@ -63,6 +65,12 @@ export function SimulationPage() {
 
       const data: SimulationResult = await res.json()
 
+      // 임시 데이터 제공 (백엔드 미구현 대비)
+      if (!data.optionA.ratio) {
+        data.optionA.ratio = 65;
+        data.optionB.ratio = 35;
+      }
+
       setResult(data)
       setState('result')
     } catch (error) {
@@ -82,12 +90,10 @@ export function SimulationPage() {
       <header className="mb-6">
         <div className="flex items-center gap-2 mb-2">
           <Sparkles className="h-6 w-6 text-primary" />
-
           <h1 className="text-xl font-bold text-foreground">
             미래 선택 시뮬레이션
           </h1>
         </div>
-
         <p className="text-sm text-muted-foreground">
           고민되는 선택을 AI가 비교 분석해드려요
         </p>
@@ -108,9 +114,7 @@ export function SimulationPage() {
                 <Badge
                   variant="secondary"
                   className="cursor-pointer"
-                  onClick={() =>
-                    setInput('복수전공을 할지 말지 고민 중이야')
-                  }
+                  onClick={() => setInput('복수전공을 할지 말지 고민 중이야')}
                 >
                   복수전공 vs 전공심화
                 </Badge>
@@ -118,9 +122,7 @@ export function SimulationPage() {
                 <Badge
                   variant="secondary"
                   className="cursor-pointer"
-                  onClick={() =>
-                    setInput('취업을 먼저 할지 대학원을 갈지 고민 중이야')
-                  }
+                  onClick={() => setInput('취업을 먼저 할지 대학원을 갈지 고민 중이야')}
                 >
                   취업 vs 대학원
                 </Badge>
@@ -128,9 +130,7 @@ export function SimulationPage() {
                 <Badge
                   variant="secondary"
                   className="cursor-pointer"
-                  onClick={() =>
-                    setInput('공모전을 준비할지 인턴을 준비할지 고민 중이야')
-                  }
+                  onClick={() => setInput('공모전을 준비할지 인턴을 준비할지 고민 중이야')}
                 >
                   공모전 vs 인턴
                 </Badge>
@@ -156,11 +156,9 @@ export function SimulationPage() {
             <Loader2 className="h-16 w-16 text-primary animate-spin" />
             <Sparkles className="h-6 w-6 text-primary absolute -top-2 -right-2 animate-pulse" />
           </div>
-
           <p className="mt-6 text-foreground font-medium">
             AI가 분석 중이에요...
           </p>
-
           <p className="mt-2 text-sm text-muted-foreground">
             잠시만 기다려주세요
           </p>
@@ -174,15 +172,30 @@ export function SimulationPage() {
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Sparkles className="h-5 w-5 text-primary" />
               </div>
-
               <div>
-                <p className="text-xs text-muted-foreground mb-1">
-                  분석 질문
-                </p>
+                <p className="text-xs text-muted-foreground mb-1">분석 질문</p>
+                <p className="font-medium text-foreground">{result.question}</p>
+              </div>
+            </CardContent>
+          </Card>
 
-                <p className="font-medium text-foreground">
-                  {result.question}
-                </p>
+          {/* 📊 데이터 기반 통계 바 UI 대시보드 */}
+          <Card className="bg-secondary/20">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold text-foreground">비슷한 고민을 한 선배들의 선택 분포</span>
+              </div>
+              <div className="relative w-full h-6 bg-peach rounded-full overflow-hidden flex text-xs font-bold text-white text-center items-center">
+                <div 
+                  className="bg-mint h-full flex items-center justify-center transition-all duration-500"
+                  style={{ width: `${result.optionA.ratio}%` }}
+                >
+                  {result.optionA.title} ({result.optionA.ratio}%)
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                  {result.optionB.title} ({result.optionB.ratio}%)
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -196,9 +209,7 @@ export function SimulationPage() {
 
             <div className="flex items-center justify-center">
               <div className="h-px flex-1 bg-border" />
-              <span className="px-3 text-xs text-muted-foreground">
-                VS
-              </span>
+              <span className="px-3 text-xs text-muted-foreground">VS</span>
               <div className="h-px flex-1 bg-border" />
             </div>
 
@@ -213,11 +224,8 @@ export function SimulationPage() {
             <CardContent>
               <div className="flex items-center gap-2 mb-3">
                 <Lightbulb className="h-5 w-5 text-primary" />
-                <CardTitle className="text-base">
-                  종합 조언
-                </CardTitle>
+                <CardTitle className="text-base">종합 조언</CardTitle>
               </div>
-
               <p className="text-sm text-foreground leading-relaxed">
                 {result.summary}
               </p>
@@ -246,8 +254,8 @@ interface OptionCardProps {
     cons: string[]
     preparation: string[]
     recommendation: string
+    ratio?: number
   }
-
   label: string
   color: 'mint' | 'peach'
 }
@@ -270,19 +278,14 @@ function OptionCard({
           <Badge variant={color} className="mb-2">
             {label}
           </Badge>
-
           <CardTitle>{option.title}</CardTitle>
         </div>
 
         <div>
           <div className="flex items-center gap-2 mb-2">
             <ArrowRight className="h-4 w-4 text-primary" />
-
-            <span className="text-sm font-medium text-foreground">
-              예상 미래
-            </span>
+            <span className="text-sm font-medium text-foreground">예상 미래</span>
           </div>
-
           <p className="text-sm text-muted-foreground ml-6">
             {option.future}
           </p>
@@ -291,12 +294,8 @@ function OptionCard({
         <div>
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="h-4 w-4 text-green-500" />
-
-            <span className="text-sm font-medium text-foreground">
-              장점
-            </span>
+            <span className="text-sm font-medium text-foreground">장점</span>
           </div>
-
           <ul className="text-sm text-muted-foreground ml-6 space-y-1">
             {option.pros.map((pro, i) => (
               <li key={i}>• {pro}</li>
@@ -307,12 +306,8 @@ function OptionCard({
         <div>
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-4 w-4 text-amber-500" />
-
-            <span className="text-sm font-medium text-foreground">
-              단점
-            </span>
+            <span className="text-sm font-medium text-foreground">단점</span>
           </div>
-
           <ul className="text-sm text-muted-foreground ml-6 space-y-1">
             {option.cons.map((con, i) => (
               <li key={i}>• {con}</li>
