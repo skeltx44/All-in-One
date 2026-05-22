@@ -4,7 +4,7 @@ import { Character } from '@/components/common/Character'
 import { ExpBar } from '@/components/common/ExpBar'
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Trophy, Zap, Star } from 'lucide-react'
+import { ArrowLeft, Trophy, Star } from 'lucide-react'
 
 type GrowthStage = {
   level: number
@@ -19,21 +19,36 @@ type BadgeItem = {
   date: string
 }
 
-type RecentActivity = {
-  id: number
-  action: string
-  detail: string
-  exp: number
-  date: string
-}
-
 type CharacterData = {
   level: number
   exp: number
   maxExp: number
   growthStages: GrowthStage[]
   badges: BadgeItem[]
-  recentActivities: RecentActivity[]
+}
+
+const growthStages: GrowthStage[] = [
+  {
+    level: 1,
+    name: '씨앗 단계',
+    description: '진로 여정을 막 시작했어요.',
+  },
+  {
+    level: 2,
+    name: '새싹 단계',
+    description: '조금씩 방향을 잡아가고 있어요.',
+  },
+  {
+    level: 3,
+    name: '꽃 단계',
+    description: '목표를 향해 꾸준히 성장하고 있어요.',
+  },
+]
+
+const getMaxExp = (level: number) => {
+  if (level === 1) return 10
+  if (level === 2) return 50
+  return 50
 }
 
 export function CharacterPage() {
@@ -44,9 +59,41 @@ export function CharacterPage() {
   }, [])
 
   const fetchCharacterData = async () => {
-    const res = await fetch('http://localhost:4000/api/characters')
-    const data: CharacterData = await res.json()
-    setCharacterData(data)
+    const savedUser = localStorage.getItem('user')
+
+    if (!savedUser) {
+      setCharacterData(null)
+      return
+    }
+
+    const user = JSON.parse(savedUser)
+
+    const res = await fetch(`http://localhost:4000/api/db/characters/${user.id}`)
+
+    if (!res.ok) {
+      console.error('캐릭터 조회 실패')
+      setCharacterData(null)
+      return
+    }
+
+    const dbCharacter = await res.json()
+
+    setCharacterData({
+      level: dbCharacter.level,
+      exp: dbCharacter.exp,
+      maxExp: getMaxExp(dbCharacter.level),
+      growthStages,
+      badges: dbCharacter.badge
+        ? [
+            {
+              id: 1,
+              icon: '🏅',
+              name: dbCharacter.badge,
+              date: '획득 완료',
+            },
+          ]
+        : [],
+    })
   }
 
   if (!characterData) {
@@ -82,19 +129,24 @@ export function CharacterPage() {
       </header>
 
       <section className="flex flex-col items-center mb-8">
-        <Character size="lg" />
+        <Character size="lg" level={characterData.level} />
 
         <div className="mt-6 text-center">
           <h2 className="text-2xl font-bold text-foreground mb-1">
             {currentStage?.name}
           </h2>
+
           <p className="text-sm text-muted-foreground mb-4">
             {currentStage?.description}
           </p>
         </div>
 
         <div className="w-full max-w-xs">
-          <ExpBar />
+          <ExpBar
+            exp={characterData.exp}
+            maxExp={characterData.maxExp}
+            level={characterData.level}
+          />
         </div>
       </section>
 
@@ -125,54 +177,59 @@ export function CharacterPage() {
             <CardTitle className="text-base">획득 배지</CardTitle>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {characterData.badges.map((badge) => (
-              <div
-                key={badge.id}
-                className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
-              >
-                <span className="text-2xl">{badge.icon}</span>
+          {characterData.badges.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              아직 획득한 배지가 없어요.
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {characterData.badges.map((badge) => (
+                <div
+                  key={badge.id}
+                  className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
+                >
+                  <span className="text-2xl">{badge.icon}</span>
 
-                <div>
-                  <p className="font-medium text-foreground text-sm">
-                    {badge.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{badge.date}</p>
+                  <div>
+                    <p className="font-medium text-foreground text-sm">
+                      {badge.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {badge.date}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <Card>
         <CardContent>
           <div className="flex items-center gap-2 mb-4">
-            <Zap className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base">최근 활동</CardTitle>
+            <Star className="h-5 w-5 text-primary" />
+            <CardTitle className="text-base">성장 단계</CardTitle>
           </div>
 
           <div className="space-y-3">
-            {characterData.recentActivities.map((activity) => (
+            {growthStages.map((stage) => (
               <div
-                key={activity.id}
-                className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
+                key={stage.level}
+                className="flex items-center justify-between rounded-xl bg-secondary/50 p-3"
               >
                 <div>
-                  <p className="font-medium text-foreground text-sm">
-                    {activity.action}
+                  <p className="text-sm font-medium text-foreground">
+                    Lv.{stage.level} {stage.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {activity.detail}
+                    {stage.description}
                   </p>
                 </div>
 
-                <div className="text-right">
-                  <Badge variant="mint" className="mb-1">
-                    +{activity.exp} EXP
-                  </Badge>
-                  <p className="text-xs text-muted-foreground">{activity.date}</p>
-                </div>
+                {characterData.level >= stage.level && (
+                  <Badge>달성</Badge>
+                )}
               </div>
             ))}
           </div>
