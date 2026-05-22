@@ -29,16 +29,52 @@ export function ProfilePage() {
   }, [])
 
   const fetchUserData = async () => {
-    const res = await fetch('http://localhost:4000/api/users')
-    const data: UserData = await res.json()
-    setUserData(data)
+    const savedUser = localStorage.getItem('user')
+
+    if (!savedUser) {
+      setUserData(null)
+      return
+    }
+
+    const user = JSON.parse(savedUser)
+
+    const characterRes = await fetch(
+      `http://localhost:4000/api/db/characters/${user.id}`
+    )
+
+    const careerRes = await fetch(
+      `http://localhost:4000/api/db/user-careers/${user.id}`
+    )
+
+    const character = await characterRes.json()
+    const career = await careerRes.json()
+
+    setUserData({
+      nickname: user.nickname,
+      level: character?.level ?? 1,
+      career: career?.selected_career || '아직 선택하지 않음',
+      interests: career?.interest_field
+        ? career.interest_field.split(',').filter(Boolean)
+        : [],
+      goal: career?.goal || '아직 설정하지 않음',
+      savedItems: [],
+    })
   }
 
   if (!userData) {
-    return (
-      <div className="min-h-screen px-4 pt-12 pb-8 safe-area-top">
-        <p className="text-sm text-muted-foreground">프로필 정보를 불러오는 중...</p>
-      </div>
+  return (
+    <div className="min-h-screen px-4 pt-12 pb-8 safe-area-top">
+      <header className="mb-6">
+        <h1 className="text-xl font-bold text-foreground mb-2">프로필</h1>
+        <p className="text-sm text-muted-foreground">로그인 후 이용할 수 있어요</p>
+      </header>
+
+      <Link to="/login">
+        <Button className="w-full">
+          로그인하러 가기
+        </Button>
+      </Link>
+    </div>
     )
   }
 
@@ -103,7 +139,7 @@ export function ProfilePage() {
         </CardContent>
       </Card>
 
-      <Link to="/start">
+      <Link to="/start?mode=edit">
         <Button variant="secondary" className="w-full mb-6">
           <RefreshCcw className="h-4 w-4" />
           진로 다시 선택하기

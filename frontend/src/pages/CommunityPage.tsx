@@ -4,6 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Heart, MessageCircle, Send } from 'lucide-react'
+import { addActivity } from '@/lib/addActivity'
+
+type User = {
+  id: number
+  email: string
+  nickname: string
+}
 
 type Post = {
   id: number
@@ -18,6 +25,7 @@ type Post = {
 
 export function CommunityPage() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [user, setUser] = useState<User | null>(null)
 
   const [newPost, setNewPost] = useState({
     title: '',
@@ -28,15 +36,34 @@ export function CommunityPage() {
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
+    const savedUser = localStorage.getItem('user')
+
+    if (savedUser) {
+      setUser(JSON.parse(savedUser))
+    }
+
     fetchPosts()
   }, [])
 
+  const formatPost = (post: any): Post => ({
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    tags: post.category
+      ? post.category.split(',').map((tag: string) => tag.trim()).filter(Boolean)
+      : [],
+    author: post.author || post.nickname || '익명',
+    date: post.created_at ? post.created_at.slice(0, 10) : '',
+    likes: 0,
+    comments: 0,
+  })
+
   const fetchPosts = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/posts')
-      const data: Post[] = await res.json()
+      const res = await fetch('http://localhost:4000/api/db/posts')
+      const data = await res.json()
 
-      setPosts(data)
+      setPosts(data.map(formatPost))
     } catch (error) {
       console.error('게시글 불러오기 실패:', error)
     }
@@ -45,22 +72,38 @@ export function CommunityPage() {
   const handleSubmit = async () => {
     if (!newPost.title.trim() || !newPost.content.trim()) return
 
+    if (!user) {
+      alert('로그인 후 글을 작성할 수 있습니다.')
+      return
+    }
+
     try {
-      const res = await fetch('http://localhost:4000/api/posts', {
+      const res = await fetch('http://localhost:4000/api/db/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          user_id: user.id,
           title: newPost.title,
-          tags: newPost.tags,
           content: newPost.content,
+          category: newPost.tags,
         }),
       })
 
-      const createdPost: Post = await res.json()
+      if (!res.ok) {
+        throw new Error('게시글 등록 실패')
+      }
 
-      setPosts([createdPost, ...posts])
+      
+      await res.json()
+      await fetchPosts()
+      await addActivity(
+        user.id,
+        'post_create',
+        '커뮤니티 게시글 작성',
+        10
+      )
 
       setNewPost({
         title: '',
@@ -76,7 +119,6 @@ export function CommunityPage() {
 
   return (
     <div className="min-h-screen px-4 pt-12 pb-24 safe-area-top">
-      {/* Header */}
       <header className="mb-6">
         <h1 className="text-xl font-bold text-foreground mb-2">
           커뮤니티
@@ -87,7 +129,6 @@ export function CommunityPage() {
         </p>
       </header>
 
-      {/* New Post Form */}
       <Card className="mb-6">
         <CardContent className="space-y-3 p-4">
           {!isExpanded ? (
@@ -95,7 +136,7 @@ export function CommunityPage() {
               onClick={() => setIsExpanded(true)}
               className="w-full text-left text-muted-foreground py-2"
             >
-              새 글을 작성해보세요...
+              {user ? '새 글을 작성해보세요...' : '로그인 후 글을 작성할 수 있어요'}
             </button>
           ) : (
             <>
@@ -158,7 +199,6 @@ export function CommunityPage() {
         </CardContent>
       </Card>
 
-      {/* Posts */}
       <div className="space-y-3">
         {posts.map((post) => (
           <Card key={post.id}>
