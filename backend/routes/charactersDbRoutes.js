@@ -3,8 +3,8 @@ const router = express.Router()
 const pool = require("../db")
 
 const getLevelByExp = (exp) => {
-  if (exp >= 200) return 3
-  if (exp >= 100) return 2
+  if (exp >= 50) return 3
+  if (exp >= 20) return 2
   return 1
 }
 
@@ -80,20 +80,8 @@ router.post("/:userId/activities", async (req, res) => {
     const current = currentResult.rows[0]
 
     const totalExp = current.exp + exp_amount
-
-    let newLevel = 1
-    let newExp = totalExp
-
-    if (totalExp >= 60) {
-      newLevel = 3
-      newExp = 50
-    } else if (totalExp >= 10) {
-      newLevel = 2
-      newExp = totalExp - 10
-    } else {
-      newLevel = 1
-      newExp = totalExp
-    }
+    const newLevel = getLevelByExp(totalExp)
+    const newExp = totalExp
 
     const updatedResult = await pool.query(
       `

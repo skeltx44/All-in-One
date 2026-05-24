@@ -62,117 +62,165 @@ export function ProfilePage() {
   }
 
   if (!userData) {
-  return (
-    <div className="min-h-screen px-4 pt-12 pb-8 safe-area-top">
-      <header className="mb-6">
-        <h1 className="text-xl font-bold text-foreground mb-2">프로필</h1>
-        <p className="text-sm text-muted-foreground">로그인 후 이용할 수 있어요</p>
-      </header>
+    return (
+      <div className="px-6 pt-5">
+        <header className="mb-4">
+          <h1 className="mb-1 text-xl font-bold text-foreground">프로필</h1>
+          <p className="text-[13px] text-muted-foreground">
+            로그인 후 이용할 수 있어요
+          </p>
+        </header>
 
-      <Link to="/login">
-        <Button className="w-full">
-          로그인하러 가기
-        </Button>
-      </Link>
-    </div>
+        <Link to="/login">
+          <Button className="h-10 w-full rounded-[22px]">
+            로그인하러 가기
+          </Button>
+        </Link>
+      </div>
     )
   }
 
   return (
-    <div className="min-h-screen px-4 pt-12 pb-8 safe-area-top">
-      <header className="mb-6">
-        <h1 className="text-xl font-bold text-foreground mb-2">프로필</h1>
-        <p className="text-sm text-muted-foreground">나의 진로 정보 관리</p>
+    <div className="px-4 pt-5">
+      <header className="mb-4 pl-2">
+        <h1 className="mb-1 text-xl font-bold text-foreground">프로필</h1>
+        <p className="text-[13px] text-muted-foreground">
+          나의 진로 정보 관리
+        </p>
       </header>
 
-      <Card className="mb-4">
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-b from-primary/20 to-mint/30 flex items-center justify-center">
-              <User className="h-8 w-8 text-primary" />
+      <Card className="mb-2.5 rounded-[30px] py-0">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-3 -ml-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b from-blue-100 to-sky-50 shadow-inner">
+              <User className="h-7 w-7 text-primary" strokeWidth={1.9} />
             </div>
+
             <div>
-              <h2 className="text-lg font-bold text-foreground">{userData.nickname}</h2>
-              <p className="text-sm text-muted-foreground">Lv.{userData.level}</p>
+              <h2 className="text-[16px] font-semibold text-foreground">
+                {userData.nickname}
+              </h2>
+              <p className="mt-0.5 text-[13px] text-muted-foreground">
+                Lv.{userData.level}
+              </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="mb-4">
-        <CardContent className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Target className="h-5 w-5 text-primary" />
+      <Card className="mb-2 rounded-[30px] py-0">
+        <CardContent className="space-y-3 p-4">
+          <div className="flex items-start gap-3 -ml-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
+              <Target className="h-4.5 w-4.5 text-primary" strokeWidth={1.9} />
             </div>
-            <div className="flex-1">
-              <p className="text-xs text-muted-foreground mb-1">선택한 진로</p>
-              <p className="font-medium text-foreground">{userData.career}</p>
+
+            <div className="min-w-0 flex-1">
+              <p className="mb-0.5 text-[11px] text-muted-foreground">
+                선택한 진로
+              </p>
+              <p className="text-[14px] font-medium text-foreground">
+                {userData.career}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-mint/30">
-              <Heart className="h-5 w-5 text-accent-foreground" />
+          <div className="flex items-start gap-3 -ml-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+              <Heart className="h-4.5 w-4.5 text-emerald-700" strokeWidth={1.9} />
             </div>
-            <div className="flex-1">
-              <p className="text-xs text-muted-foreground mb-1">관심 분야</p>
+
+            <div className="min-w-0 flex-1">
+              <p className="mb-1 text-[11px] text-muted-foreground">
+                관심 분야
+              </p>
+
               <div className="flex flex-wrap gap-1">
-                {userData.interests.map((interest, i) => (
-                  <Badge key={i} variant="secondary">
-                    {interest}
-                  </Badge>
-                ))}
+                {userData.interests.length > 0 ? (
+                  userData.interests.map((interest, i) => (
+                    <Badge
+                      key={i}
+                      variant="secondary"
+                      className="h-5 px-1.5 text-[10px] font-medium"
+                    >
+                      {interest}
+                    </Badge>
+                  ))
+                ) : (
+                  <p className="text-[14px] font-medium text-foreground">
+                    아직 설정하지 않음
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-peach/50">
-              <Award className="h-5 w-5 text-secondary-foreground" />
+          <div className="flex items-start gap-3 -ml-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100">
+              <Award className="h-4.5 w-4.5 text-amber-700" strokeWidth={1.9} />
             </div>
-            <div className="flex-1">
-              <p className="text-xs text-muted-foreground mb-1">목표</p>
-              <p className="font-medium text-foreground">{userData.goal}</p>
+
+            <div className="min-w-0 flex-1">
+              <p className="mb-0.5 text-[11px] text-muted-foreground">
+                목표
+              </p>
+              <p className="text-[14px] font-medium text-foreground">
+                {userData.goal}
+              </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       <Link to="/start?mode=edit">
-        <Button variant="secondary" className="w-full mb-6">
-          <RefreshCcw className="h-4 w-4" />
+        <Button
+          variant="secondary"
+          className="mb-2.5 h-10 w-full rounded-[22px] bg-[#d8f0fb] text-[13px] font-medium text-slate-700 hover:bg-[#cceaf7]"
+        >
+          <RefreshCcw className="h-3.5 w-3.5" />
           진로 다시 선택하기
         </Button>
       </Link>
 
-      <Card>
-        <CardContent>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Bookmark className="h-5 w-5 text-primary" />
-              <CardTitle className="text-base">저장한 정보</CardTitle>
+      <Card className="rounded-[30px] py-0">
+        <CardContent className="p-4">
+          <div className="mb-1 flex items-center justify-between">
+            <div className="flex items-center gap-2 -ml-2">
+              <Bookmark className="h-4 w-4 text-primary" strokeWidth={1.9} />
+              <CardTitle className="text-[14px] font-semibold">
+                저장한 정보
+              </CardTitle>
             </div>
-            <Link to="/info" className="text-xs text-primary">
+
+            <Link to="/info" className="text-[11px] font-medium text-primary">
               전체보기
             </Link>
           </div>
 
-          <div className="space-y-3">
-            {userData.savedItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between p-3 rounded-xl bg-secondary/50"
-              >
-                <div>
-                  <p className="font-medium text-foreground text-sm">{item.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.category} · 마감 {item.deadline}
-                  </p>
+          <div className="space-y-2">
+            {userData.savedItems.length > 0 ? (
+              userData.savedItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-[18px] bg-secondary/50 p-3"
+                >
+                  <div>
+                    <p className="text-[13px] font-medium text-foreground">
+                      {item.title}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      {item.category} · 마감 {item.deadline}
+                    </p>
+                  </div>
+
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="py-2 text-[13px] text-muted-foreground">
+                아직 저장한 정보가 없어요
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>

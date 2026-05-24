@@ -118,25 +118,27 @@ export function CommunityPage() {
   }
 
   return (
-    <div className="min-h-screen px-4 pt-12 pb-24 safe-area-top">
-      <header className="mb-6">
-        <h1 className="text-xl font-bold text-foreground mb-2">
+    <div className="px-4 pt-5">
+      <header className="mb-4 pl-2">
+        <h1 className="mb-1 text-xl font-bold text-foreground">
           커뮤니티
         </h1>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-[13px] text-muted-foreground">
           같은 꿈을 향해 함께 성장해요
         </p>
       </header>
 
-      <Card className="mb-6">
-        <CardContent className="space-y-3 p-4">
+      <Card className="mb-3 rounded-[30px] py-0">
+        <CardContent className="space-y-2 p-2">
           {!isExpanded ? (
             <button
               onClick={() => setIsExpanded(true)}
-              className="w-full text-left text-muted-foreground py-2"
+              className="w-full rounded-[24px] bg-white px-4 py-3 text-left text-[13px] text-slate-500"
             >
-              {user ? '새 글을 작성해보세요...' : '로그인 후 글을 작성할 수 있어요'}
+              {user
+                ? '새 글을 작성해보세요...'
+                : '로그인 후 글을 작성할 수 있어요'}
             </button>
           ) : (
             <>
@@ -149,6 +151,7 @@ export function CommunityPage() {
                     title: e.target.value,
                   })
                 }
+                className="h-10 w-full rounded-[18px] border border-slate-200 bg-white px-4 text-[13px] placeholder:text-slate-500"
               />
 
               <Input
@@ -160,6 +163,7 @@ export function CommunityPage() {
                     tags: e.target.value,
                   })
                 }
+                className="h-10 w-full rounded-[18px] border border-slate-200 bg-white px-4 text-[13px] placeholder:text-slate-500"
               />
 
               <Textarea
@@ -171,26 +175,29 @@ export function CommunityPage() {
                     content: e.target.value,
                   })
                 }
+                className="min-h-[72px] w-full rounded-[20px] border border-slate-200 bg-white px-4 py-3 text-[13px] placeholder:text-slate-500"
               />
 
               <div className="flex gap-2">
                 <Button
                   variant="secondary"
-                  className="flex-1"
+                  size="sm"
+                  className="h-9 flex-1 rounded-[18px]"
                   onClick={() => setIsExpanded(false)}
                 >
                   취소
                 </Button>
 
                 <Button
-                  className="flex-1"
+                  size="sm"
+                  className="h-9 flex-1 rounded-[18px]"
                   onClick={handleSubmit}
                   disabled={
                     !newPost.title.trim() ||
                     !newPost.content.trim()
                   }
                 >
-                  <Send className="h-4 w-4 mr-1" />
+                  <Send className="mr-1 h-3.5 w-3.5" />
                   등록
                 </Button>
               </div>
@@ -199,45 +206,45 @@ export function CommunityPage() {
         </CardContent>
       </Card>
 
-      <div className="space-y-3">
+      <div className="space-y-2.5 pb-24">
         {posts.map((post) => (
-          <Card key={post.id}>
-            <CardContent className="p-4">
-              <h3 className="font-semibold text-foreground mb-2">
+          <Card key={post.id} className="rounded-[18px] py-0">
+            <CardContent className="p-3">
+              <h3 className="mb-1.5 line-clamp-1 text-[14px] font-semibold leading-tight text-foreground">
                 {post.title}
               </h3>
 
-              <div className="flex flex-wrap gap-1 mb-2">
+              <div className="mb-2 flex flex-wrap gap-1">
                 {post.tags.map((tag, index) => (
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="text-xs"
+                    className="h-5 px-1.5 text-[10px] font-medium"
                   >
                     #{tag}
                   </Badge>
                 ))}
               </div>
 
-              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+              <p className="mb-2 line-clamp-2 text-[12px] leading-[1.45] text-muted-foreground">
                 {post.content}
               </p>
 
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <span>{post.author}</span>
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <div className="flex min-w-0 items-center gap-1">
+                  <span className="truncate">{post.author}</span>
                   <span>·</span>
                   <span>{post.date}</span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <button className="flex items-center gap-1 hover:text-primary transition-colors">
-                    <Heart className="h-4 w-4" />
+                <div className="flex shrink-0 items-center gap-3">
+                  <button className="flex items-center gap-1 transition-colors hover:text-primary">
+                    <Heart className="h-3.5 w-3.5" />
                     <span>{post.likes}</span>
                   </button>
 
-                  <button className="flex items-center gap-1 hover:text-primary transition-colors">
-                    <MessageCircle className="h-4 w-4" />
+                  <button className="flex items-center gap-1 transition-colors hover:text-primary">
+                    <MessageCircle className="h-3.5 w-3.5" />
                     <span>{post.comments}</span>
                   </button>
                 </div>

@@ -22,7 +22,6 @@ type BadgeItem = {
 type CharacterData = {
   level: number
   exp: number
-  maxExp: number
   growthStages: GrowthStage[]
   badges: BadgeItem[]
 }
@@ -45,10 +44,18 @@ const growthStages: GrowthStage[] = [
   },
 ]
 
-const getMaxExp = (level: number) => {
-  if (level === 1) return 10
-  if (level === 2) return 50
-  return 50
+const getNextLevelInfo = (level: number, exp: number) => {
+  if (level >= 3) return null
+
+  const targetExp = level === 1 ? 20 : 50
+  const nextLevel = level + 1
+  const remainExp = Math.max(targetExp - exp, 0)
+
+  return {
+    nextLevel,
+    targetExp,
+    remainExp,
+  }
 }
 
 export function CharacterPage() {
@@ -81,7 +88,6 @@ export function CharacterPage() {
     setCharacterData({
       level: dbCharacter.level,
       exp: dbCharacter.exp,
-      maxExp: getMaxExp(dbCharacter.level),
       growthStages,
       badges: dbCharacter.badge
         ? [
@@ -98,8 +104,8 @@ export function CharacterPage() {
 
   if (!characterData) {
     return (
-      <div className="min-h-screen px-4 pt-12 pb-8 safe-area-top">
-        <p className="text-sm text-muted-foreground">
+      <div className="px-4 pt-5">
+        <p className="text-[13px] text-muted-foreground">
           캐릭터 정보를 불러오는 중...
         </p>
       </div>
@@ -110,91 +116,95 @@ export function CharacterPage() {
     .filter((stage) => stage.level <= characterData.level)
     .pop()
 
-  const nextStage = characterData.growthStages.find(
-    (stage) => stage.level > characterData.level
+  const nextLevelInfo = getNextLevelInfo(
+    characterData.level,
+    characterData.exp,
   )
 
   return (
-    <div className="min-h-screen px-4 pt-12 pb-8 safe-area-top">
-      <header className="mb-6">
+    <div className="px-4 pt-5 pb-32">
+      <header className="relative mb-3 h-[76px]">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-4"
+          className="absolute left-0 top-0 inline-flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4" />
           <span>돌아가기</span>
         </Link>
 
-        <h1 className="text-xl font-bold text-foreground">나의 캐릭터</h1>
+        <h1 className="absolute left-0 right-0 top-7 text-center text-xl font-bold tracking-[-0.03em] text-foreground">
+          캐릭터의 성장을 확인해보세요
+        </h1>
       </header>
 
-      <section className="flex flex-col items-center mb-8">
-        <Character size="lg" level={characterData.level} />
+      <section className="mb-4 flex flex-col items-center">
+        <Character size="home" level={characterData.level} />
 
-        <div className="mt-6 text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-1">
+        <div className="mt-3 text-center">
+          <h2 className="text-[18px] font-semibold tracking-[-0.03em] text-foreground">
             {currentStage?.name}
           </h2>
 
-          <p className="text-sm text-muted-foreground mb-4">
+          <p className="mt-1 text-[13px] text-muted-foreground">
             {currentStage?.description}
           </p>
         </div>
 
-        <div className="w-full max-w-xs">
+        <div className="mt-4 w-full">
           <ExpBar
             exp={characterData.exp}
-            maxExp={characterData.maxExp}
             level={characterData.level}
+            size="sm"
           />
         </div>
       </section>
 
-      {nextStage && (
-        <Card className="mb-6 bg-primary/5 border-primary/20">
-          <CardContent className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-primary/10">
-              <Star className="h-6 w-6 text-primary" />
+      {nextLevelInfo && (
+        <Card className="mb-3 rounded-[30px] py-0">
+          <CardContent className="flex items-center gap-3 p-3.5">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 shadow-inner">
+              <Star className="h-5 w-5 text-primary" strokeWidth={1.9} />
             </div>
 
-            <div>
-              <p className="text-xs text-muted-foreground">다음 단계</p>
-              <p className="font-semibold text-foreground">
-                Lv.{nextStage.level} {nextStage.name}
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-muted-foreground">
+                다음 단계
               </p>
-              <p className="text-xs text-primary">
-                {characterData.maxExp - characterData.exp} EXP 더 필요해요
+              <p className="mt-0.5 text-[14px] font-semibold text-foreground">
+                Lv.{nextLevelInfo.nextLevel}까지 {nextLevelInfo.remainExp} EXP 남았어요
               </p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      <Card className="mb-4">
-        <CardContent>
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base">획득 배지</CardTitle>
+      <Card className="mb-3 rounded-[30px] py-0">
+        <CardContent className="px-1 py-2.5">
+          <div className="mb-3 flex items-center gap-2">
+            <Trophy className="h-4 w-4 text-primary" strokeWidth={1.9} />
+            <CardTitle className="text-[14px] font-semibold">
+              획득 배지
+            </CardTitle>
           </div>
 
           {characterData.badges.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground">
               아직 획득한 배지가 없어요.
             </p>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {characterData.badges.map((badge) => (
                 <div
                   key={badge.id}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50"
+                  className="flex items-center gap-2 rounded-[18px] bg-secondary/50 px-2 py-2.5"
                 >
-                  <span className="text-2xl">{badge.icon}</span>
+                  <span className="text-xl">{badge.icon}</span>
 
-                  <div>
-                    <p className="font-medium text-foreground text-sm">
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-medium text-foreground">
                       {badge.name}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-[11px] text-muted-foreground">
                       {badge.date}
                     </p>
                   </div>
@@ -205,30 +215,34 @@ export function CharacterPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent>
-          <div className="flex items-center gap-2 mb-4">
-            <Star className="h-5 w-5 text-primary" />
-            <CardTitle className="text-base">성장 단계</CardTitle>
+      <Card className="rounded-[30px] py-0">
+        <CardContent className="px-1 py-2.5">
+          <div className="mb-3 flex items-center gap-2">
+            <Star className="h-4 w-4 text-primary" strokeWidth={1.9} />
+            <CardTitle className="text-[14px] font-semibold">
+              성장 단계
+            </CardTitle>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {growthStages.map((stage) => (
               <div
                 key={stage.level}
-                className="flex items-center justify-between rounded-xl bg-secondary/50 p-3"
+                className="flex items-center justify-between gap-3 rounded-[18px] bg-secondary/50 px-3 py-2.5"
               >
-                <div>
-                  <p className="text-sm font-medium text-foreground">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-medium text-foreground">
                     Lv.{stage.level} {stage.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
                     {stage.description}
                   </p>
                 </div>
 
                 {characterData.level >= stage.level && (
-                  <Badge>달성</Badge>
+                  <Badge className="h-5 shrink-0 px-1.5 text-[10px] font-medium">
+                    달성
+                  </Badge>
                 )}
               </div>
             ))}

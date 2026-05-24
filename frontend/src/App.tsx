@@ -13,10 +13,10 @@ import { CharacterPage } from '@/pages/CharacterPage'
 export default function App() {
   return (
     <Routes>
-      <Route path="signup" element={<SignupPage />} />
-      <Route path="login" element={<LoginPage />} />
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
+        <Route path="signup" element={<SignupPage />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="start" element={<StartPage />} />
         <Route path="simulation" element={<SimulationPage />} />
         <Route path="info" element={<InfoPage />} />

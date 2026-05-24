@@ -2,7 +2,6 @@ import { Progress } from '@/components/ui/progress'
 
 interface ExpBarProps {
   exp: number
-  maxExp: number
   level: number
   showLabel?: boolean
   size?: 'sm' | 'md'
@@ -10,16 +9,21 @@ interface ExpBarProps {
 
 export function ExpBar({
   exp,
-  maxExp,
   level,
   showLabel = true,
   size = 'md',
 }: ExpBarProps) {
   const isMaxLevel = level >= 3
-  const displayExp = isMaxLevel ? maxExp : Math.min(exp, maxExp)
+
+  const levelStartExp = level === 1 ? 0 : level === 2 ? 20 : 50
+  const levelTargetExp = level === 1 ? 20 : level === 2 ? 50 : 50
+
+  const progressExp = Math.max(exp - levelStartExp, 0)
+  const progressMaxExp = levelTargetExp - levelStartExp
+
   const percentage = isMaxLevel
     ? 100
-    : Math.min(Math.round((displayExp / maxExp) * 100), 100)
+    : Math.min(Math.round((progressExp / progressMaxExp) * 100), 100)
 
   return (
     <div className="w-full">
@@ -30,7 +34,7 @@ export function ExpBar({
           </span>
 
           <span className="text-sm font-medium text-primary">
-            {isMaxLevel ? 'MAX LEVEL' : `${displayExp} / ${maxExp} EXP`}
+            {isMaxLevel ? 'MAX LEVEL' : `${exp} / ${levelTargetExp} EXP`}
           </span>
         </div>
       )}
@@ -41,7 +45,7 @@ export function ExpBar({
       />
 
       {showLabel && (
-        <div className="text-center mt-1">
+        <div className="mt-1 flex justify-end">
           <span className="text-xs text-muted-foreground">
             {percentage}%
           </span>
