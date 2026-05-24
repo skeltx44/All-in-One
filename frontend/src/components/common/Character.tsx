@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 interface CharacterProps {
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'home' | 'md' | 'lg'
   showAnimation?: boolean
   className?: string
   level?: number
@@ -15,6 +15,7 @@ export function Character({
 }: CharacterProps) {
   const sizeClasses = {
     sm: 'w-24 h-24',
+    home: 'w-42 h-42',
     md: 'w-40 h-40',
     lg: 'w-56 h-56',
   }
