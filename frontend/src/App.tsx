@@ -9,6 +9,7 @@ import { InfoPage } from '@/pages/InfoPage'
 import { CommunityPage } from '@/pages/CommunityPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { CharacterPage } from '@/pages/CharacterPage'
+import { AttendancePage } from '@/pages/AttendancePage'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="community" element={<CommunityPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="character" element={<CharacterPage />} />
+        <Route path="attendance" element={<AttendancePage />} />
       </Route>
     </Routes>
   )
