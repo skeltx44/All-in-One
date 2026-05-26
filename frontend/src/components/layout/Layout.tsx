@@ -7,7 +7,8 @@ export function Layout() {
   const hideBottomNav =
     location.pathname === '/start' ||
     location.pathname === '/login' ||
-    location.pathname === '/signup'
+    location.pathname === '/signup' ||
+    location.pathname === '/attendance'
 
   return (
     <div className="bg-background">
