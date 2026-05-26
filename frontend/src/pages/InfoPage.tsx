@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Calendar, Search } from 'lucide-react'
+import { Calendar, Search, X } from 'lucide-react'
 
 type InfoItem = {
   id: number
@@ -18,6 +18,10 @@ export function InfoPage() {
   const [infoItems, setInfoItems] = useState<InfoItem[]>([])
   const [selectedCategory, setSelectedCategory] = useState('전체')
   const [searchText, setSearchText] = useState('')
+  const [selectedInfo, setSelectedInfo] = useState<InfoItem | null>(null)
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastType, setToastType] = useState<'success' | 'error'>('success')
+  const [isToastVisible, setIsToastVisible] = useState(false)
 
   useEffect(() => {
     fetchInfoItems()
@@ -40,6 +44,68 @@ export function InfoPage() {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
   }
 
+  const showToast = (
+    message: string,
+    type: 'success' | 'error'
+  ) => {
+    setToastMessage(message)
+    setToastType(type)
+    setIsToastVisible(false)
+
+    requestAnimationFrame(() => {
+      setIsToastVisible(true)
+    })
+
+    setTimeout(() => {
+      setIsToastVisible(false)
+    }, 1100)
+
+    setTimeout(() => {
+      setToastMessage('')
+    }, 2400)
+  }
+
+  const handleSaveInfo = async () => {
+    if (!selectedInfo) return
+
+    try {
+      const savedUser = localStorage.getItem('user')
+
+      if (!savedUser) return
+
+      const user = JSON.parse(savedUser)
+
+      const res = await fetch(
+        'http://localhost:4000/api/db/scraps',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: user.id,
+            info_item_id: selectedInfo.id,
+          }),
+        }
+      )
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        showToast(data.error || '스크랩 저장 실패', 'error')
+        return
+      }
+
+      showToast('관심 정보가 저장되었어요', 'success')
+      setSelectedInfo(null)
+
+      setSelectedInfo(null)
+    } catch (err) {
+      console.error(err)
+      showToast('서버 오류가 발생했어요', 'error')
+    }
+  }
+
   const filteredItems = infoItems.filter((item) => {
     const matchesCategory =
       selectedCategory === '전체' || item.category === selectedCategory
@@ -53,7 +119,7 @@ export function InfoPage() {
   })
 
   return (
-    <div className="px-4 pt-5">
+    <div className="relative px-4 pt-5">
       <header className="mb-4 pl-2">
         <h1 className="mb-1 text-xl font-bold text-foreground">
           진로 정보
@@ -99,10 +165,17 @@ export function InfoPage() {
             : []
 
           return (
-            <Card key={item.id} className="rounded-[18px] py-0">
+            <Card
+              key={item.id}
+              onClick={() => setSelectedInfo(item)}
+              className="cursor-pointer rounded-[18px] py-0 active:scale-[0.99]"
+            >
               <CardContent className="p-3">
                 <div className="mb-1.5 flex items-center justify-between">
-                  <Badge variant="secondary" className="-ml-1 h-5 px-1.5 text-[10px] font-medium">
+                  <Badge
+                    variant="secondary"
+                    className="-ml-1 h-5 px-1.5 text-[10px] font-medium"
+                  >
                     {item.category}
                   </Badge>
 
@@ -148,6 +221,71 @@ export function InfoPage() {
           </p>
         )}
       </div>
+
+      {selectedInfo && (
+        <>
+          <div
+            onClick={() => setSelectedInfo(null)}
+            className="fixed inset-0 z-40 bg-slate-950/20"
+          />
+
+          <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-32px)] -translate-x-1/2 -translate-y-1/2 rounded-[26px] bg-white p-4 shadow-[0_12px_36px_rgba(73,105,140,0.24)]">
+            <button
+              type="button"
+              onClick={() => setSelectedInfo(null)}
+              className="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-500"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <h3 className="pr-8 text-[16px] font-semibold tracking-[-0.03em] text-slate-950">
+              {selectedInfo.title}
+            </h3>
+
+            <p className="mt-1 text-[13px] leading-relaxed text-slate-500">
+              이 정보를 관심 목록에 저장할까요?
+            </p>
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedInfo(null)}
+                className="h-10 rounded-2xl bg-slate-100 text-[14px] font-semibold text-slate-500 active:scale-[0.98]"
+              >
+                취소
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveInfo}
+                className="h-10 rounded-2xl bg-primary text-[14px] font-semibold text-primary-foreground active:scale-[0.98]"
+              >
+                저장
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {toastMessage && (
+        <div
+          className={
+            isToastVisible
+              ? `fixed left-1/2 top-8 z-[60] w-[270px] -translate-x-1/2 translate-y-0 rounded-[18px] px-5 py-3 text-center text-[14px] font-semibold tracking-[-0.03em] shadow-[0_8px_24px_rgba(100,160,80,0.12)] opacity-75 transition-all duration-700 ease-out ${
+                  toastType === 'success'
+                    ? 'border border-lime-200 bg-lime-100 text-lime-700'
+                    : 'border border-rose-200 bg-rose-100 text-rose-700'
+                }`
+              : `fixed left-1/2 top-8 z-[60] w-[270px] -translate-x-1/2 -translate-y-1 rounded-[18px] px-5 py-3 text-center text-[14px] font-semibold tracking-[-0.03em] shadow-[0_8px_24px_rgba(100,160,80,0.12)] opacity-0 transition-all duration-700 ease-out ${
+                  toastType === 'success'
+                    ? 'border border-lime-200 bg-lime-100 text-lime-700'
+                    : 'border border-rose-200 bg-rose-100 text-rose-700'
+                }`
+          }
+        >
+          {toastMessage}
+        </div>
+      )}
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { User, Target, Heart, Award, Bookmark, RefreshCcw, ChevronRight } from 'lucide-react'
+import { User, Target, Heart, Award, Bookmark, RefreshCcw } from 'lucide-react'
 
 type SavedItem = {
   id: number
@@ -49,6 +49,12 @@ export function ProfilePage() {
     const character = await characterRes.json()
     const career = await careerRes.json()
 
+    const scrapsRes = await fetch(
+      `http://localhost:4000/api/db/scraps/${user.id}`
+    )
+
+    const scraps = await scrapsRes.json()
+
     setUserData({
       nickname: user.nickname,
       level: character?.level ?? 1,
@@ -57,7 +63,7 @@ export function ProfilePage() {
         ? career.interest_field.split(',').filter(Boolean)
         : [],
       goal: career?.goal || '아직 설정하지 않음',
-      savedItems: [],
+      savedItems: scraps,
     })
   }
 
@@ -81,7 +87,7 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="px-4 pt-5">
+    <div className="px-4 pt-5 pb-25">
       <header className="mb-4 pl-2">
         <h1 className="mb-1 text-xl font-bold text-foreground">프로필</h1>
         <p className="text-[13px] text-muted-foreground">
@@ -197,30 +203,20 @@ export function ProfilePage() {
             </Link>
           </div>
 
-          <div className="space-y-2">
-            {userData.savedItems.length > 0 ? (
-              userData.savedItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between rounded-[18px] bg-secondary/50 p-3"
-                >
-                  <div>
-                    <p className="text-[13px] font-medium text-foreground">
-                      {item.title}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      {item.category} · 마감 {item.deadline}
-                    </p>
-                  </div>
-
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              ))
-            ) : (
-              <p className="py-2 text-[13px] text-muted-foreground">
-                아직 저장한 정보가 없어요
-              </p>
-            )}
+          <div className="-mx-2.5 space-y-2">
+            {userData.savedItems.slice(0, 3).map((item) => (
+              <div
+                key={item.id}
+                className="w-full rounded-[18px] bg-secondary/50 px-3 py-2.5"
+              >
+                <p className="line-clamp-1 text-[13px] font-medium text-foreground">
+                  {item.title}
+                </p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {item.deadline?.slice(0, 10)}
+                </p>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
