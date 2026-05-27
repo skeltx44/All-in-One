@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft, CalendarCheck, Stamp } from 'lucide-react'
 import { useExpToast } from '@/components/common/useExpToast'
+import { useLevelUpModal } from '@/components/common/useLevelUpModal'
 
 const weekDays = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -39,6 +40,7 @@ export function AttendancePage() {
   const [isStamping, setIsStamping] = useState(false)
   
   const { showExpToast, ExpToast } = useExpToast()
+  const { showLevelUp, LevelUpModal } = useLevelUpModal()
 
   const addCharacterExp = async (
     amount: number,
@@ -47,11 +49,11 @@ export function AttendancePage() {
   ) => {
     const savedUser = localStorage.getItem('user')
 
-    if (!savedUser) return
+    if (!savedUser) return null
 
     const user = JSON.parse(savedUser)
 
-    await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
+    const res = await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +63,9 @@ export function AttendancePage() {
         description,
         exp_amount: amount,
       }),
-    })
+})
+
+return await res.json()
   }
 
   const todayKey = getTodayKey()
@@ -84,8 +88,14 @@ export function AttendancePage() {
     setAttendedDates(nextDates)
     localStorage.setItem('attendanceDates', JSON.stringify(nextDates))
 
-    await addCharacterExp(10, 'attendance', '출석 스탬프')
+    const expResult = await addCharacterExp(10, 'attendance', '출석 스탬프')
     showExpToast(10)
+
+    if (expResult?.leveled_up) {
+      setTimeout(() => {
+        showLevelUp(expResult.previous_level, expResult.new_level)
+      }, 1200)
+    }
 
     setTimeout(() => {
       setIsStamping(false)
@@ -201,6 +211,7 @@ export function AttendancePage() {
         </CardContent>
       </Card>
       {ExpToast}
+      {LevelUpModal}
     </div>
   )
 }

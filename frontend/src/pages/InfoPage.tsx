@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Calendar, Search, X } from 'lucide-react'
 import { useExpToast } from '@/components/common/useExpToast'
+import { useLevelUpModal } from '@/components/common/useLevelUpModal'
 
 type InfoItem = {
   id: number
@@ -25,6 +26,7 @@ export function InfoPage() {
   const [isToastVisible, setIsToastVisible] = useState(false)
 
   const { showExpToast, ExpToast } = useExpToast()
+  const { showLevelUp, LevelUpModal } = useLevelUpModal()
 
   const addCharacterExp = async (
     amount: number,
@@ -33,11 +35,11 @@ export function InfoPage() {
   ) => {
     const savedUser = localStorage.getItem('user')
 
-    if (!savedUser) return
+   if (!savedUser) return null
 
     const user = JSON.parse(savedUser)
 
-    await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
+    const res = await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -47,7 +49,9 @@ export function InfoPage() {
         description,
         exp_amount: amount,
       }),
-    })
+})
+
+return await res.json()
   }
 
   useEffect(() => {
@@ -123,14 +127,18 @@ export function InfoPage() {
         return
       }
 
-      await addCharacterExp(5, 'scrap', '관심 정보 저장')
+      const expResult = await addCharacterExp(5, 'scrap', '관심 정보 저장')
 
       setSelectedInfo(null)
-      showToast('관심 정보가 저장되었어요', 'success')
 
-      setTimeout(() => {
-        showExpToast(5)
-      }, 2500)
+      showToast('관심 정보가 저장되었어요', 'success')
+      showExpToast(5)
+
+      if (expResult?.leveled_up) {
+        setTimeout(() => {
+          showLevelUp(expResult.previous_level, expResult.new_level)
+        }, 1200)
+      }
       
     } catch (err) {
       console.error(err)
@@ -319,6 +327,7 @@ export function InfoPage() {
         </div>
       )}
       {ExpToast}
+      {LevelUpModal}
     </div>
   )
 }

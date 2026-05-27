@@ -77,7 +77,17 @@ router.post("/", async (req, res) => {
       )
     }
 
-    res.status(201).json(postResult.rows[0])
+    res.status(201).json({
+      post: postResult.rows[0],
+      exp: current
+        ? {
+            exp_gained: 5,
+            previous_level: current.level,
+            new_level: getLevelByExp(current.exp + 5),
+            leveled_up: getLevelByExp(current.exp + 5) > current.level,
+          }
+        : null,
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json({

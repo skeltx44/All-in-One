@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
   }
 })
 
-router.post("/", async (req, res) => {
+const createUser = async (req, res) => {
   try {
     const { email, password, nickname } = req.body
 
@@ -60,7 +60,15 @@ router.post("/", async (req, res) => {
       [newUser.id, null, null, null]
     )
 
-    res.status(201).json(newUser)
+    res.status(201).json({
+      message: "회원가입 성공",
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        nickname: newUser.nickname,
+      },
+    })
+
   } catch (err) {
     console.error(err)
 
@@ -70,7 +78,10 @@ router.post("/", async (req, res) => {
 
     res.status(500).json({ error: "유저 생성 실패" })
   }
-})
+}
+
+router.post("/", createUser)
+router.post("/signup", createUser)
 
 router.post("/login", async (req, res) => {
   try {
