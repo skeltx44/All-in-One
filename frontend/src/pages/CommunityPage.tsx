@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Heart, MessageCircle, Send } from 'lucide-react'
-import { addActivity } from '@/lib/addActivity'
+import { useExpToast } from '@/components/common/useExpToast'
 
 type User = {
   id: number
@@ -34,6 +34,8 @@ export function CommunityPage() {
   })
 
   const [isExpanded, setIsExpanded] = useState(false)
+
+  const { showExpToast, ExpToast } = useExpToast()
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user')
@@ -98,12 +100,8 @@ export function CommunityPage() {
       
       await res.json()
       await fetchPosts()
-      await addActivity(
-        user.id,
-        'post_create',
-        '커뮤니티 게시글 작성',
-        10
-      )
+
+      showExpToast(5)
 
       setNewPost({
         title: '',
@@ -253,6 +251,7 @@ export function CommunityPage() {
           </Card>
         ))}
       </div>
+      {ExpToast}
     </div>
   )
 }

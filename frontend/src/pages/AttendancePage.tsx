@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { ArrowLeft, CalendarCheck, Stamp } from 'lucide-react'
+import { useExpToast } from '@/components/common/useExpToast'
 
 const weekDays = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -36,6 +37,32 @@ const getWeekDates = () => {
 export function AttendancePage() {
   const [attendedDates, setAttendedDates] = useState<string[]>([])
   const [isStamping, setIsStamping] = useState(false)
+  
+  const { showExpToast, ExpToast } = useExpToast()
+
+  const addCharacterExp = async (
+    amount: number,
+    activityType: string,
+    description: string
+  ) => {
+    const savedUser = localStorage.getItem('user')
+
+    if (!savedUser) return
+
+    const user = JSON.parse(savedUser)
+
+    await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_type: activityType,
+        description,
+        exp_amount: amount,
+      }),
+    })
+  }
 
   const todayKey = getTodayKey()
   const weekDates = getWeekDates()
@@ -48,7 +75,7 @@ export function AttendancePage() {
     }
   }, [])
 
-  const handleAttendance = () => {
+  const handleAttendance = async () => {
     if (isTodayAttended) return
 
     setIsStamping(true)
@@ -56,6 +83,9 @@ export function AttendancePage() {
     const nextDates = [...attendedDates, todayKey]
     setAttendedDates(nextDates)
     localStorage.setItem('attendanceDates', JSON.stringify(nextDates))
+
+    await addCharacterExp(10, 'attendance', '출석 스탬프')
+    showExpToast(10)
 
     setTimeout(() => {
       setIsStamping(false)
@@ -170,6 +200,7 @@ export function AttendancePage() {
           </div>
         </CardContent>
       </Card>
+      {ExpToast}
     </div>
   )
 }
