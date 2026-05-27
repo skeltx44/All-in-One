@@ -10,6 +10,7 @@ import {
   Users,
   RotateCcw,
 } from 'lucide-react'
+import { useExpToast } from '@/components/common/useExpToast'
 
 type SimulationState = 'input' | 'loading' | 'result' | 'roadmap'
 
@@ -40,6 +41,32 @@ export function SimulationPage() {
   const [state, setState] = useState<SimulationState>('input')
   const [input, setInput] = useState('')
   const [result, setResult] = useState<SimulationResult | null>(null)
+
+  const { showExpToast, ExpToast } = useExpToast()
+
+  const addCharacterExp = async (
+    amount: number,
+    activityType: string,
+    description: string
+  ) => {
+    const savedUser = localStorage.getItem('user')
+
+    if (!savedUser) return
+
+    const user = JSON.parse(savedUser)
+
+    await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_type: activityType,
+        description,
+        exp_amount: amount,
+      }),
+    })
+  }
 
   const handleSimulate = async () => {
     if (!input.trim()) return
@@ -89,6 +116,9 @@ export function SimulationPage() {
           roadmapA: Array.isArray(data.roadmapA) ? data.roadmapA : [],
           roadmapB: Array.isArray(data.roadmapB) ? data.roadmapB : [],
         }
+
+      await addCharacterExp(15, 'simulation', 'AI 시뮬레이션 완료')
+      showExpToast(15)
 
       setResult(normalizedResult)
       setState('result')
@@ -321,6 +351,8 @@ export function SimulationPage() {
           </button>
         </div>
       )}
+
+      {ExpToast}
     </div>
   )
 }

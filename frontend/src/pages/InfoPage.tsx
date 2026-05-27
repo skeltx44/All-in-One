@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Calendar, Search, X } from 'lucide-react'
+import { useExpToast } from '@/components/common/useExpToast'
 
 type InfoItem = {
   id: number
@@ -22,6 +23,32 @@ export function InfoPage() {
   const [toastMessage, setToastMessage] = useState('')
   const [toastType, setToastType] = useState<'success' | 'error'>('success')
   const [isToastVisible, setIsToastVisible] = useState(false)
+
+  const { showExpToast, ExpToast } = useExpToast()
+
+  const addCharacterExp = async (
+    amount: number,
+    activityType: string,
+    description: string
+  ) => {
+    const savedUser = localStorage.getItem('user')
+
+    if (!savedUser) return
+
+    const user = JSON.parse(savedUser)
+
+    await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        activity_type: activityType,
+        description,
+        exp_amount: amount,
+      }),
+    })
+  }
 
   useEffect(() => {
     fetchInfoItems()
@@ -96,10 +123,15 @@ export function InfoPage() {
         return
       }
 
-      showToast('관심 정보가 저장되었어요', 'success')
-      setSelectedInfo(null)
+      await addCharacterExp(5, 'scrap', '관심 정보 저장')
 
       setSelectedInfo(null)
+      showToast('관심 정보가 저장되었어요', 'success')
+
+      setTimeout(() => {
+        showExpToast(5)
+      }, 2500)
+      
     } catch (err) {
       console.error(err)
       showToast('서버 오류가 발생했어요', 'error')
@@ -271,21 +303,22 @@ export function InfoPage() {
         <div
           className={
             isToastVisible
-              ? `fixed left-1/2 top-8 z-[60] w-[270px] -translate-x-1/2 translate-y-0 rounded-[18px] px-5 py-3 text-center text-[14px] font-semibold tracking-[-0.03em] shadow-[0_8px_24px_rgba(100,160,80,0.12)] opacity-75 transition-all duration-700 ease-out ${
+              ? `fixed left-1/2 top-8 z-[60] w-[270px] -translate-x-1/2 translate-y-0 rounded-[18px] px-5 py-3 text-center text-[14px] font-semibold tracking-[-0.03em] opacity-90 transition-all duration-700 ease-out ${
                   toastType === 'success'
-                    ? 'border border-lime-200 bg-lime-100 text-lime-700'
-                    : 'border border-rose-200 bg-rose-100 text-rose-700'
+                    ? 'border border-[#B9F6D3] bg-[#DDFBEA] text-[#00B86B] shadow-[0_8px_24px_rgba(0,184,107,0.14)]'
+                    : 'border border-rose-200 bg-rose-100 text-rose-700 shadow-[0_8px_24px_rgba(190,70,90,0.12)]'
                 }`
-              : `fixed left-1/2 top-8 z-[60] w-[270px] -translate-x-1/2 -translate-y-1 rounded-[18px] px-5 py-3 text-center text-[14px] font-semibold tracking-[-0.03em] shadow-[0_8px_24px_rgba(100,160,80,0.12)] opacity-0 transition-all duration-700 ease-out ${
+              : `fixed left-1/2 top-8 z-[60] w-[270px] -translate-x-1/2 -translate-y-1 rounded-[18px] px-5 py-3 text-center text-[14px] font-semibold tracking-[-0.03em] opacity-0 transition-all duration-700 ease-out ${
                   toastType === 'success'
-                    ? 'border border-lime-200 bg-lime-100 text-lime-700'
-                    : 'border border-rose-200 bg-rose-100 text-rose-700'
+                    ? 'border border-[#B9F6D3] bg-[#DDFBEA] text-[#00B86B] shadow-[0_8px_24px_rgba(0,184,107,0.14)]'
+                    : 'border border-rose-200 bg-rose-100 text-rose-700 shadow-[0_8px_24px_rgba(190,70,90,0.12)]'
                 }`
           }
         >
           {toastMessage}
         </div>
       )}
+      {ExpToast}
     </div>
   )
 }

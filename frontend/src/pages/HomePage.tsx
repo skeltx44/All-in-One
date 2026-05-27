@@ -97,8 +97,8 @@ export function HomePage() {
             to="/attendance"
             className="flex h-[100px] flex-col justify-between rounded-[22px] bg-white p-3.5 text-left shadow-[0_6px_16px_rgba(73,105,140,0.12)] active:scale-[0.98]"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lime-100 shadow-inner">
-              <CalendarCheck className="h-5 w-5 text-lime-600" strokeWidth={1.8} />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#DDFBEA] shadow-inner">
+              <CalendarCheck className="h-5 w-5 text-[#00B86B]" strokeWidth={1.8} />
             </div>
 
             <div>
