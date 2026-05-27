@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -15,7 +16,7 @@ export function LoginPage() {
     setIsLoading(true)
 
     try {
-      const res = await fetch('http://localhost:4000/api/db/users/login', {
+      const res = await fetch(`${API_BASE_URL}/api/db/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from 'react'
 import { Input, Textarea } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -64,7 +65,7 @@ export function CommunityPage() {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/db/posts')
+      const res = await fetch(`${API_BASE_URL}/api/db/posts`)
       const data = await res.json()
 
       setPosts(data.map(formatPost))
@@ -82,7 +83,7 @@ export function CommunityPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:4000/api/db/posts', {
+      const res = await fetch(`${API_BASE_URL}/api/db/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

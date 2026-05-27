@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
@@ -39,18 +40,18 @@ export function ProfilePage() {
     const user = JSON.parse(savedUser)
 
     const characterRes = await fetch(
-      `http://localhost:4000/api/db/characters/${user.id}`
+      `${API_BASE_URL}/api/db/characters/${user.id}`
     )
 
     const careerRes = await fetch(
-      `http://localhost:4000/api/db/user-careers/${user.id}`
+      `${API_BASE_URL}/api/db/user-careers/${user.id}`
     )
 
     const character = await characterRes.json()
     const career = await careerRes.json()
 
     const scrapsRes = await fetch(
-      `http://localhost:4000/api/db/scraps/${user.id}`
+      `${API_BASE_URL}/api/db/scraps/${user.id}`
     )
 
     const scraps = await scrapsRes.json()
