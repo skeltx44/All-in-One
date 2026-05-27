@@ -59,18 +59,27 @@ export function StartPage() {
 
     const savedUser = localStorage.getItem('user')
 
-    if (!savedUser) {
-      alert('로그인 후 이용할 수 있습니다.')
+        if (!savedUser || savedUser === 'undefined') {
+        alert('로그인 후 이용할 수 있습니다.')
+        navigate('/login')
+        return
+      }
+
+        if (isEtcCareer && !customCareer.trim()) {
+          alert('진로를 직접 입력해주세요.')
+          return
+        }
+
+        let user
+
+    try {
+      user = JSON.parse(savedUser)
+    } catch (err) {
+      localStorage.removeItem('user')
+      alert('로그인 정보가 올바르지 않습니다. 다시 로그인해주세요.')
       navigate('/login')
       return
     }
-
-    if (isEtcCareer && !customCareer.trim()) {
-      alert('진로를 직접 입력해주세요.')
-      return
-    }
-
-    const user = JSON.parse(savedUser)
 
     const finalCareer = isEtcCareer
       ? customCareer.trim()
@@ -104,7 +113,7 @@ export function StartPage() {
       }
 
       if (mode === 'signup') {
-        await addActivity(user.id, 'career_select', '진로 정보 설정', 10)
+        await addActivity(user.id, 'career_select', '진로 정보 설정', 5)
 
         localStorage.removeItem('user')
         navigate('/login')

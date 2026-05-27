@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Heart, MessageCircle, Send } from 'lucide-react'
 import { useExpToast } from '@/components/common/useExpToast'
+import { useLevelUpModal } from '@/components/common/useLevelUpModal'
 
 type User = {
   id: number
@@ -36,6 +37,7 @@ export function CommunityPage() {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const { showExpToast, ExpToast } = useExpToast()
+  const { showLevelUp, LevelUpModal } = useLevelUpModal()
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user')
@@ -98,18 +100,25 @@ export function CommunityPage() {
       }
 
       
-      await res.json()
-      await fetchPosts()
+      const data = await res.json()
+        await fetchPosts()
 
-      showExpToast(5)
+        showExpToast(5)
 
-      setNewPost({
-        title: '',
-        tags: '',
-        content: '',
-      })
+        if (data.exp?.leveled_up) {
+          setTimeout(() => {
+            showLevelUp(data.exp.previous_level, data.exp.new_level)
+          }, 1200)
+        }
 
-      setIsExpanded(false)
+        setNewPost({
+          title: '',
+          tags: '',
+          content: '',
+        })
+
+        setIsExpanded(false)
+
     } catch (error) {
       console.error('게시글 등록 실패:', error)
     }
@@ -252,6 +261,7 @@ export function CommunityPage() {
         ))}
       </div>
       {ExpToast}
+      {LevelUpModal}
     </div>
   )
 }

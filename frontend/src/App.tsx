@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import type { ReactNode } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
 import { SignupPage } from '@/pages/SignupPage'
 import { LoginPage } from '@/pages/LoginPage'
@@ -11,20 +12,101 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import { CharacterPage } from '@/pages/CharacterPage'
 import { AttendancePage } from '@/pages/AttendancePage'
 
+function RequireAuth({ children }: { children: ReactNode }) {
+  const savedUser = localStorage.getItem('user')
+
+  if (!savedUser || savedUser === 'undefined') {
+    return <Navigate to="/login" replace />
+  }
+
+  try {
+    JSON.parse(savedUser)
+  } catch {
+    localStorage.removeItem('user')
+    return <Navigate to="/login" replace />
+  }
+
+  return <>{children}</>
+}
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<HomePage />} />
+        <Route
+          index
+          element={
+            <RequireAuth>
+              <HomePage />
+            </RequireAuth>
+          }
+        />
+
         <Route path="signup" element={<SignupPage />} />
         <Route path="login" element={<LoginPage />} />
-        <Route path="start" element={<StartPage />} />
-        <Route path="simulation" element={<SimulationPage />} />
-        <Route path="info" element={<InfoPage />} />
-        <Route path="community" element={<CommunityPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="character" element={<CharacterPage />} />
-        <Route path="attendance" element={<AttendancePage />} />
+
+        <Route
+          path="start"
+          element={
+            <RequireAuth>
+              <StartPage />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="simulation"
+          element={
+            <RequireAuth>
+              <SimulationPage />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="info"
+          element={
+            <RequireAuth>
+              <InfoPage />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="community"
+          element={
+            <RequireAuth>
+              <CommunityPage />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="profile"
+          element={
+            <RequireAuth>
+              <ProfilePage />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="character"
+          element={
+            <RequireAuth>
+              <CharacterPage />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="attendance"
+          element={
+            <RequireAuth>
+              <AttendancePage />
+            </RequireAuth>
+          }
+        />
       </Route>
     </Routes>
   )

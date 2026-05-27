@@ -96,7 +96,15 @@ router.post("/:userId/activities", async (req, res) => {
       [newExp, newLevel, userId]
     )
 
-    res.json(updatedResult.rows[0])
+    const updatedCharacter = updatedResult.rows[0]
+
+    res.json({
+      character: updatedCharacter,
+      exp_gained: exp_amount,
+      previous_level: current.level,
+      new_level: newLevel,
+      leveled_up: newLevel > current.level,
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: "활동 저장 실패" })
