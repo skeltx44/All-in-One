@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -39,7 +40,7 @@ export function InfoPage() {
 
     const user = JSON.parse(savedUser)
 
-    const res = await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
+    const res = await fetch(`${API_BASE_URL}/api/db/characters/${user.id}/activities`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ return await res.json()
 
   const fetchInfoItems = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/db/info-items')
+      const res = await fetch(`${API_BASE_URL}/api/db/info-items`)
       const data = await res.json()
       setInfoItems(data)
     } catch (err) {
@@ -107,7 +108,7 @@ return await res.json()
       const user = JSON.parse(savedUser)
 
       const res = await fetch(
-        'http://localhost:4000/api/db/scraps',
+        `${API_BASE_URL}/api/db/scraps`,
         {
           method: 'POST',
           headers: {

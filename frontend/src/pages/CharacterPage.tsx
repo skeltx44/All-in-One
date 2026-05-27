@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Character } from '@/components/common/Character'
@@ -75,7 +76,7 @@ export function CharacterPage() {
 
     const user = JSON.parse(savedUser)
 
-    const res = await fetch(`http://localhost:4000/api/db/characters/${user.id}`)
+    const res = await fetch(`${API_BASE_URL}/api/db/characters/${user.id}`)
 
     if (!res.ok) {
       console.error('캐릭터 조회 실패')

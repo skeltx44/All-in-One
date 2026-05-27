@@ -1,10 +1,12 @@
+import { API_BASE_URL } from "@/lib/api";
+
 export async function addActivity(
   userId: number,
   activity_type: string,
   description: string,
   exp_amount: number
 ) {
-  await fetch(`http://localhost:4000/api/db/characters/${userId}/activities`, {
+  await fetch(`${API_BASE_URL}/api/db/characters/${userId}/activities`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

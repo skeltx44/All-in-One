@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from 'react'
 import { Character } from '@/components/common/Character'
 import { ExpBar } from '@/components/common/ExpBar'
@@ -35,11 +36,11 @@ export function HomePage() {
     const user = JSON.parse(savedUser)
 
     const characterRes = await fetch(
-      `http://localhost:4000/api/db/characters/${user.id}`
+      `${API_BASE_URL}/api/db/characters/${user.id}`
     )
 
     const careerRes = await fetch(
-      `http://localhost:4000/api/db/user-careers/${user.id}`
+      `${API_BASE_URL}/api/db/user-careers/${user.id}`
     )
 
     const characterData = await characterRes.json()

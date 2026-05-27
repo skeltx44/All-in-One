@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -94,7 +95,7 @@ export function StartPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:4000/api/db/user-careers/${user.id}`,
+        `${API_BASE_URL}/api/db/user-careers/${user.id}`,
         {
           method: 'PUT',
           headers: {

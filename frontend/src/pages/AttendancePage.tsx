@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
@@ -53,7 +54,7 @@ export function AttendancePage() {
 
     const user = JSON.parse(savedUser)
 
-    const res = await fetch(`http://localhost:4000/api/db/characters/${user.id}/activities`, {
+    const res = await fetch(`${API_BASE_URL}/api/db/characters/${user.id}/activities`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

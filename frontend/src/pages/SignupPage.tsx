@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "@/lib/api";
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -16,7 +17,7 @@ export function SignupPage() {
     setIsLoading(true)
 
     try {
-      const res = await fetch('http://localhost:4000/api/db/users', {
+      const res = await fetch(`${API_BASE_URL}/api/db/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -33,8 +34,11 @@ export function SignupPage() {
         return
       }
 
-      localStorage.setItem('user', JSON.stringify(data.user))
+      const signedUpUser = data.user ?? data
+
+      localStorage.setItem('user', JSON.stringify(signedUpUser))
       navigate('/start?mode=signup')
+
     } catch (err) {
       setError('서버 연결에 실패했습니다.')
     } finally {
