@@ -302,9 +302,7 @@ Frontend + Backend 통합 레포지토리
 - Backend: Render 배포
 - Database: Supabase 프로젝트 사용
 
-```text
-서비스 URL: all-in-one-seven-ashy.vercel.app
-```
+[서비스 바로가기](all-in-one-seven-ashy.vercel.app)
 
 ---
 
@@ -387,7 +385,7 @@ frontend/
 
 [API 및 기능 명세서](https://zigzag-primrose-bfd.notion.site/36efdbe4a90a80ce88e9fbe4148ffe02?v=36efdbe4a90a80e0b5ca000cd58e5c5b)
 
-![API 명세서](docs/images/api-spec.png)
+![API 명세서](docs/api-spec.png)
 
 ---
 
