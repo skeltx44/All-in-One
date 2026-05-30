@@ -99,6 +99,27 @@ All in One의 AI 기능은 사용자가 막연하게 느끼던 진로 고민을 
 
 각 선택이 가질 수 있는 장점과 부담, 이후 필요한 준비 과정을 함께 제시함으로써 사용자는 선택의 부담을 줄이고, 자신의 상황에 맞는 방향을 더 명확하게 판단할 수 있습니다. 또한 선택 이후 필요한 행동과 과정을 구체적인 로드맵으로 확인할 수 있습니다.
 
+#### 진로 시뮬레이션 화면
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="docs/images/request.png" width="180" />
+    </td>
+    <td align="center">
+      <img src="docs/images/simulation.png" width="180" />
+    </td>
+    <td align="center">
+      <img src="docs/images/roadmap.png" width="180" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center">고민 입력</td>
+    <td align="center">AI 분석 결과</td>
+    <td align="center">미래 로드맵</td>
+  </tr>
+</table>
+
 ### 2. 캐릭터 성장 시스템
 
 사용자의 진로 관련 활동을 통해 경험치를 얻고 캐릭터를 성장시킬 수 있습니다.
