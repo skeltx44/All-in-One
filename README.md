@@ -104,13 +104,13 @@ All in One의 AI 기능은 사용자가 막연하게 느끼던 진로 고민을 
 <table>
   <tr>
     <td align="center">
-      <img src="docs/images/request.png" width="180" />
+      <img src="docs/request.png" width="180" />
     </td>
     <td align="center">
-      <img src="docs/images/simulation.png" width="180" />
+      <img src="docs/simulation.png" width="180" />
     </td>
     <td align="center">
-      <img src="docs/images/roadmap.png" width="180" />
+      <img src="docs/roadmap.png" width="180" />
     </td>
   </tr>
   <tr>
