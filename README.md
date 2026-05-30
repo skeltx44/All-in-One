@@ -302,7 +302,7 @@ Frontend + Backend 통합 레포지토리
 - Backend: Render 배포
 - Database: Supabase 프로젝트 사용
 
-[서비스 바로가기](all-in-one-seven-ashy.vercel.app)
+[서비스 바로가기](https://all-in-one-seven-ashy.vercel.app/)
 
 ---
 
